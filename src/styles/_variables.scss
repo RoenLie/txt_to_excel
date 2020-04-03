@@ -1,0 +1,26 @@
+$defaultText: rgba(240, 240, 240, 1);
+$defaultBg: rgba(55, 71, 79, 1);
+$defaultDark: rgba(30, 30, 30, 1);
+$defaultDarkLight: rgba(50, 50, 50, 1);
+$defaultGrey: rgba(70, 70, 70, 1);
+$defaultBorderColor: rgba(18, 18, 18, 1);
+$defaultHighlight: rgba(178, 235, 242, 1);
+$scrollbarBg: $defaultBg;
+$thumbBg: rgba(255, 255, 255, 0.15);
+$deepMaroon: rgba(81, 35, 35, 1);
+
+@mixin scrollbar {
+  &::-webkit-scrollbar {
+    width: 0.25em;
+    height: 0.25em;
+  }
+  &::-webkit-scrollbar-track {
+    background: $defaultDark;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $thumbBg;
+    border: 1px solid $defaultBorderColor;
+    border-right: none;
+    border-bottom: none;
+  }
+}
