@@ -2,7 +2,7 @@
   <div class="base">
     <div class="main-container">
       <input type="file" name="file" id="file" @change="openFile" multiple />
-      <button @click="logFileData">Convert Data To Excel</button>
+      <button @click="convertToExcel">Convert Data To Excel</button>
     </div>
   </div>
 </template>
@@ -16,18 +16,28 @@ export default defineComponent({
   name: "Main",
   props: {},
   setup() {
-    var _RawFileData: any = "";
-    var _ParsedFileData: any = "";
+    let parsedFileData: any = [];
 
-    const openFile = (e: any) => {
-      const reader: any = new FileReader();
-      reader.onload = () => convertToExcel(reader.result);
-      reader.readAsText(e.target.files[0]);
+    const createExcelDataStructure = (fileData: any) => {
+      return fileData.split("\n");
     };
 
-    const logFileData = () => {};
+    const openFile = (e: any) => {
+      let files: any = e.target.files;
+      if (files) {
+        for (let i = 0, f; (f = files[i]); i++) {
+          let reader = new FileReader();
+          reader.onload = (f => {
+            return (e: any) => {
+              parsedFileData.push(createExcelDataStructure(e.target.result));
+            };
+          })(f);
+          reader.readAsText(f);
+        }
+      }
+    };
 
-    const convertToExcel = (fileData: any) => {
+    const convertToExcel = () => {
       const wb = XLSX.utils.book_new();
       wb.Props = {
         Title: "ShipData",
@@ -37,7 +47,7 @@ export default defineComponent({
       };
       wb.SheetNames.push("Sheet1");
 
-      const ws_data = [["hello", "world"]];
+      const ws_data = parsedFileData;
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
       wb.Sheets["Sheet1"] = ws;
@@ -56,9 +66,7 @@ export default defineComponent({
       );
     };
 
-    const createExcelDataStructure = (fileData: any) => {};
-
-    return { openFile, logFileData };
+    return { openFile, convertToExcel };
   }
 });
 </script>
@@ -87,6 +95,16 @@ export default defineComponent({
 
   input {
     background-color: $defaultBg;
+    border: 1px solid $defaultBorderColor;
+    height: 5em;
+    border-radius: 0.25em;
+    &:hover {
+      box-shadow: 0 0 6px $defaultHighlight;
+      box-shadow: 0 0 6px $defaultHighlight;
+    }
+    &:focus {
+      outline: none;
+    }
   }
 
   button {
@@ -96,7 +114,7 @@ export default defineComponent({
     height: 5em;
     font-size: 14px;
     font-weight: bold;
-    border-radius: 1em;
+    border-radius: 0.5em;
     &:hover {
       box-shadow: 0 0 6px $defaultHighlight;
       box-shadow: 0 0 6px $defaultHighlight;
