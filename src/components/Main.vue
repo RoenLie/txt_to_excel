@@ -1,6 +1,10 @@
 <template>
   <div class="base">
     <div class="main-container">
+      <div style="color:white; font-size: 2vh">
+        Upload your desired amount of .txt files, wait a second or two then
+        click the Convert Data to Excel button
+      </div>
       <input type="file" name="file" id="file" @change="openFile" multiple />
       <button @click="convertToExcel">Convert Data To Excel</button>
     </div>
