@@ -1,9 +1,14 @@
 <template>
   <div class="base">
     <div class="main-container">
-      <div style="color:white; font-size: 2vh">
+      <div style="color:white; font-size: 1.75vh">
         Upload your desired amount of .txt files, wait a second or two then
         click the Convert Data to Excel button
+      </div>
+      <div
+        style="color:white; border-top: 1px solid black; border-bottom: 1px solid black; padding: 1em;"
+      >
+        Files Parsed: {{ filesParsed }}, Sheets Processed: {{ sheetsProcessed }}
       </div>
       <div>
         <label for="speedFilter" style="color:white"
@@ -17,7 +22,7 @@
         />
       </div>
       <input type="file" name="file" id="file" @change="openFile" multiple />
-      <button @click="convertToExcel">Convert Data To Excel</button>
+      <button @click="createExcelDocument">Convert Data To Excel</button>
     </div>
   </div>
 </template>
@@ -38,8 +43,9 @@ export default defineComponent({
   props: {},
   setup() {
     let speedFilter = ref(4);
-
-    let parsedFileData: any = [];
+    let filesParsed = ref(0);
+    let sheetsProcessed = ref(0);
+    let parsedFileData: any = reactive([]);
 
     const transpose = (m: any) =>
       m[0].map((x: any, i: any) => m.map((x: any) => x[i]));
@@ -310,7 +316,7 @@ export default defineComponent({
       // fill out rows on columns with less than matrix
       matrix.forEach(item => {
         while (item.length < matrixSizer.length) {
-          item.push([item[0]]);
+          item.push(item[0]);
         }
       });
 
@@ -320,17 +326,24 @@ export default defineComponent({
           array[index].unshift(columnNames[index]);
         });
       }
-
+      filesParsed.value++;
       return matrix;
     };
 
     const openFile = (e: any) => {
+      filesParsed.value = 0;
+      sheetsProcessed.value = 0;
+      parsedFileData = [];
+
+      let filesProcessed = 0;
+
       let files: any = e.target.files;
       if (files) {
         for (let i = 0, f; (f = files[i]); i++) {
           let reader = new FileReader();
           reader.onload = (f => {
             return (e: any) => {
+              if (parsedFileData.length === 6000) return;
               parsedFileData.push(
                 transpose(createExcelDataStructure(e.target.result))
               );
@@ -341,7 +354,7 @@ export default defineComponent({
       }
     };
 
-    const convertToExcel = () => {
+    const createExcelDocument = () => {
       const wb = XLSX.utils.book_new();
       wb.Props = {
         Title: "ShipData",
@@ -349,27 +362,46 @@ export default defineComponent({
         Author: "txt_to_excel",
         CreatedDate: new Date()
       };
-      wb.SheetNames.push("Sheet1");
+      const filesPerSheet = 500;
+      const sheetAmount = Math.ceil(parsedFileData.length / filesPerSheet);
+      const arrayLength = parsedFileData.length;
 
-      const ws_data = parsedFileData.flat();
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-      wb.Sheets["Sheet1"] = ws;
+      for (let i = 0; i < sheetAmount; i++) {
+        sheetsProcessed.value++;
+        wb.SheetNames.push(`Sheet${i}`);
 
-      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
-      const s2ab = (s: any) => {
-        const buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-        const view = new Uint8Array(buf); //create uint8array as viewer
+        const initial = i * filesPerSheet;
+        const upperLimit =
+          initial < arrayLength ? initial + filesPerSheet : arrayLength;
+
+        const ws_data = parsedFileData.slice(initial, upperLimit).flat();
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+        wb.Sheets[`Sheet${i}`] = ws;
+      }
+
+      const wbOut = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+
+      const s2ab = (s: any[any]) => {
+        const buffer = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        const view = new Uint8Array(buffer);
+
         for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff; //convert to octet
-        return buf;
+        return buffer;
       };
-
       saveAs(
-        new Blob([s2ab(wbout)], { type: "application/octet-stream" }),
-        "test.xlsx"
+        new Blob([s2ab(wbOut)], { type: "application/octet-stream" }),
+        "ShipData.xlsx"
       );
     };
 
-    return { openFile, convertToExcel, speedFilter };
+    return {
+      openFile,
+      createExcelDocument,
+      speedFilter,
+      filesParsed,
+      sheetsProcessed
+    };
   }
 });
 </script>
