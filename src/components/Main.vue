@@ -28,13 +28,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  watch,
-  ref,
-  reactive,
-  watchEffect
-} from "@vue/composition-api";
+import { defineComponent, ref, reactive } from "@vue/composition-api";
 import XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
