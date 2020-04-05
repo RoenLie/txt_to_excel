@@ -2,8 +2,8 @@
   <div class="base">
     <div class="main-container">
       <div style="color:white;">
-        Upload your desired amount of .txt files, wait a second or two then
-        click the Convert Data to Excel button
+        Upload your desired amount of .txt files, wait for files parsed to match
+        amount of files then click the Convert Data to Excel button
       </div>
       <div
         style="color:white; border-top: 1px solid black; border-bottom: 1px solid black; padding: 1em;"
@@ -20,6 +20,7 @@
           >low-pass filter: speed(knops)</label
         >
         <input
+          id="inputSpeedFilter"
           name="userInteractable"
           type="text"
           v-model="speedFilter"
@@ -43,8 +44,8 @@
 <script lang="ts">
 import { defineComponent, ref, reactive } from "@vue/composition-api";
 import { saveAs } from "file-saver";
-import createExcelDataStructure from "./CreateExcelDataStructure";
 import Worker from "worker-loader!../workers/createExcelDocument.worker";
+import createExcelDataStructure from "./CreateExcelDataStructure";
 
 export default defineComponent({
   name: "Main",
@@ -57,7 +58,11 @@ export default defineComponent({
 
     const openFile = (e: any) => {
       filesParsed.value = 0;
+      status.value = "";
       parsedFileData = [];
+
+      const inputSpeedFilter: any = document.getElementById("inputSpeedFilter");
+      inputSpeedFilter.disabled = true;
 
       const transpose = (m: any) =>
         m[0].map((x: any, i: any) => m.map((x: any) => x[i]));
@@ -84,6 +89,7 @@ export default defineComponent({
           reader.readAsText(f);
         }
       }
+      if (files.length === 0) inputSpeedFilter.disabled = false;
     };
 
     const createExcelDocument = () => {
