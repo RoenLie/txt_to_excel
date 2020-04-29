@@ -10,22 +10,36 @@
       >
         Files Parsed: {{ filesParsed }}
       </div>
+      <div v-if="loading" class="loader" />
       <div
         style="color:white; border-top: 1px solid black; border-bottom: 1px solid black; padding: 1em;"
       >
         Status: {{ status }}
       </div>
-      <div>
-        <label for="speedFilter" style="color:white"
-          >low-pass filter: speed(knops)</label
-        >
-        <input
-          id="inputSpeedFilter"
-          name="userInteractable"
-          type="text"
-          v-model="speedFilter"
-          style="width:100%; text-align: center; height: 1.5em;"
-        />
+      <div style="display:flex; flex-direction:row;">
+        <div>
+          <label for="inputSpeedFilter" style="color:white">
+            low-pass filter: speed(knops)
+          </label>
+          <input
+            id="inputSpeedFilter"
+            name="userInteractable"
+            type="text"
+            v-model="speedFilter"
+            style="width:100%; text-align: center; height: 1.5em;"
+          />
+        </div>
+        <div style="display:flex; flex-direction: column; align-items: center;">
+          <label for="chkCalculateAverages" style="color:white">
+            Calculate Averages
+          </label>
+          <input
+            id="chkCalculateAverages"
+            name="userInteractable"
+            type="checkbox"
+            v-model="calculcateAverages"
+          />
+        </div>
       </div>
       <input
         type="file"
@@ -55,6 +69,8 @@ export default defineComponent({
     let filesParsed = ref(0);
     let parsedFileData: any = [];
     let status = ref("");
+    let loading = ref(false);
+    let calculcateAverages = ref(true);
 
     const openFile = (e: any) => {
       filesParsed.value = 0;
@@ -79,7 +95,8 @@ export default defineComponent({
                   createExcelDataStructure(
                     e.target.result,
                     parsedFileData,
-                    speedFilter
+                    speedFilter,
+                    calculcateAverages.value
                   )
                 )
               );
@@ -93,6 +110,7 @@ export default defineComponent({
     };
 
     const createExcelDocument = () => {
+      loading.value = true;
       const userInteractable: any = document.getElementsByName(
         "userInteractable"
       );
@@ -105,8 +123,11 @@ export default defineComponent({
 
       status.value = "excel document creation in progress";
 
+      const filesPerSheet = calculcateAverages.value ? 500 : 50;
+
       worker.postMessage({
-        inputData: parsedFileData
+        inputData: parsedFileData,
+        filesPerSheet: filesPerSheet
       });
 
       worker.onmessage = (event: any) => {
@@ -132,6 +153,7 @@ export default defineComponent({
         });
 
         worker.terminate;
+        loading.value = false;
       };
     };
 
@@ -140,7 +162,9 @@ export default defineComponent({
       createExcelDocument,
       speedFilter,
       filesParsed,
-      status
+      status,
+      loading,
+      calculcateAverages
     };
   }
 });
@@ -200,6 +224,25 @@ export default defineComponent({
     &:hover {
       box-shadow: 0 0 6px $defaultHighlight;
       box-shadow: 0 0 6px $defaultHighlight;
+    }
+  }
+}
+
+.loader {
+  margin-left: auto;
+  margin-right: auto;
+  border: 5px solid $defaultDark;
+  border-top: 5px solid $defaultBg;
+  border-radius: 50%;
+  width: 1em;
+  height: 1em;
+  animation: spin 2s linear infinite;
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
     }
   }
 }

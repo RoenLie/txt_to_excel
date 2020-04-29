@@ -1,7 +1,8 @@
 const createExcelDataStructure = (
   fileData: any,
   outData: any,
-  speedFilter: any
+  speedFilter: any,
+  calculcateAverages: boolean
 ) => {
   // split data by new line
   const splitByNewLine: any[] = fileData.split("\n");
@@ -106,7 +107,8 @@ const createExcelDataStructure = (
       ...rawData.time_stamp_post
     ],
 
-    distanceColumn: [...rawData.dist_dest_prefix, ...rawData.dist_dest_fix]
+    distanceColumn: [...rawData.dist_dest_prefix, ...rawData.dist_dest_fix],
+    statusColumn: status
   };
 
   // fill out distance column so it matches length of speed column
@@ -114,6 +116,7 @@ const createExcelDataStructure = (
     combined.distanceColumn.push("0");
   }
 
+  // ------------------------------------------------------------------------------------
   // array and temp object to store average calculations
   const averages = [];
   const temp = {
@@ -175,13 +178,13 @@ const createExcelDataStructure = (
 
   // create new arrays containing averages
   const modifiedData = {
-    newSpeedColumn: averages.map(item => item[0]),
-    newDistColumn: averages.map(item => item[1]),
-    newTimeColumn: averages.map(item => item[2]),
-    newDraughtColumn: averages.map(item => item[3]),
-    newDateColumn: averages.map(item => item[4]),
-    newRemainingDistanceColumn: averages.map(item => item[5]),
-    newStatusColumn: averages.map(item => item[6])
+    speedColumn: averages.map(item => item[0]),
+    distColumn: averages.map(item => item[1]),
+    timeColumn: averages.map(item => item[2]),
+    draughtColumn: averages.map(item => item[3]),
+    timeStampColumn: averages.map(item => item[4]),
+    distanceColumn: averages.map(item => item[5]),
+    statusColumn: averages.map(item => item[6])
   };
 
   // list of column names to be added after data parsing
@@ -226,8 +229,10 @@ const createExcelDataStructure = (
     "error_occured"
   ];
 
+  const calculatedData = calculcateAverages ? modifiedData : combined;
+
   // Create matrix sizer
-  const matrixSizer = [...Array(modifiedData.newSpeedColumn.length).fill([])];
+  const matrixSizer = [...Array(calculatedData.speedColumn.length).fill([])];
 
   // data matrix
   const matrix: any[] = [
@@ -235,14 +240,14 @@ const createExcelDataStructure = (
     [...matrixSizer],
     [...matrixSizer],
     [...matrixSizer],
-    modifiedData.newDateColumn,
+    calculatedData.timeStampColumn,
     rawData.id,
-    modifiedData.newSpeedColumn,
-    modifiedData.newDistColumn,
-    modifiedData.newTimeColumn,
-    modifiedData.newDraughtColumn,
-    modifiedData.newRemainingDistanceColumn,
-    modifiedData.newStatusColumn,
+    calculatedData.speedColumn,
+    calculatedData.distColumn,
+    calculatedData.timeColumn,
+    calculatedData.draughtColumn,
+    calculatedData.distanceColumn,
+    calculatedData.statusColumn,
     rawData.date,
     rawData.name,
     rawData.imo,

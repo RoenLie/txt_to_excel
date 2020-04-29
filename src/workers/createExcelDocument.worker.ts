@@ -12,9 +12,13 @@ worker.onmessage = (event: any) => {
     CreatedDate: new Date()
   };
 
-  const filesPerSheet = 500;
+  const filesPerSheet = event.data.filesPerSheet;
   const sheetAmount = Math.ceil(parsedFileData.length / filesPerSheet);
   const arrayLength = parsedFileData.length;
+
+  worker.postMessage({
+    statusUpdate: `creating ${sheetAmount} excel sheets from ${arrayLength} files`
+  });
 
   for (let i = 0; i < sheetAmount; i++) {
     wb.SheetNames.push(`Sheet${i}`);
@@ -29,7 +33,9 @@ worker.onmessage = (event: any) => {
     wb.Sheets[`Sheet${i}`] = ws;
   }
 
-  worker.postMessage({ statusUpdate: "starting buffer creation" });
+  worker.postMessage({
+    statusUpdate: "buffer creation (this takes a long time)"
+  });
 
   try {
     const excelData = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
