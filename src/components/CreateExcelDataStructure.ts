@@ -200,8 +200,8 @@ const createExcelDataStructure = (
       temp.speed.push(Number(combined.speedColumn[i]));
       temp.dist.push(Number(combined.distColumn[i]));
       temp.time.push(Number(combined.timeColumn[i]));
-      temp.ions = combined.ionsColumn[i];
-      temp.lats = combined.latsColumn[i];
+      temp.ions = Number(combined.ionsColumn[i]);
+      temp.lats = Number(combined.latsColumn[i]);
       temp.draught = combined.draughtColumn[i];
       temp.remainingDistance = combined.distanceColumn[i];
       temp.status = status[i];
