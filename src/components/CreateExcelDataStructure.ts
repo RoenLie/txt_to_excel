@@ -25,14 +25,12 @@ const createExcelDataStructure = (
     time_stamp_prefix: splitByNewLine[13].split(";"),
     time_stamp_fix: splitByNewLine[14].split(";"),
     time_stamp_post: splitByNewLine[15].split(";"),
-
     ions_prefix: splitByNewLine[16].split(";"),
     ions_fix: splitByNewLine[17].split(";"),
     ions_post: splitByNewLine[18].split(";"),
     lats_prefix: splitByNewLine[19].split(";"),
     lats_fix: splitByNewLine[20].split(";"),
     lats_post: splitByNewLine[21].split(";"),
-
     dist_dest_prefix: splitByNewLine[22].split(";"),
     dist_dest_fix: splitByNewLine[23].split(";"),
     date: [splitByNewLine[24]],
@@ -167,8 +165,8 @@ const createExcelDataStructure = (
         let dist = temp.dist.reduce(reducer) / temp.dist.length;
         let time = temp.time.reduce(reducer) / temp.time.length;
 
-        let ions = temp.ions.reduce(reducer) / temp.ions.length;
-        let lats = temp.lats.reduce(reducer) / temp.lats.length;
+        let ions = temp.ions;
+        let lats = temp.lats;
 
         let draught = temp.draught;
         let remainingDistance = temp.remainingDistance;
@@ -202,8 +200,8 @@ const createExcelDataStructure = (
       temp.speed.push(Number(combined.speedColumn[i]));
       temp.dist.push(Number(combined.distColumn[i]));
       temp.time.push(Number(combined.timeColumn[i]));
-      temp.ions.push(Number(combined.ionsColumn[i]));
-      temp.lats.push(Number(combined.latsColumn[i]));
+      temp.ions = combined.ionsColumn[i];
+      temp.lats = combined.latsColumn[i];
       temp.draught = combined.draughtColumn[i];
       temp.remainingDistance = combined.distanceColumn[i];
       temp.status = status[i];
