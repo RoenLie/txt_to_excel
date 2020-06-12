@@ -25,33 +25,44 @@ const createExcelDataStructure = (
     time_stamp_prefix: splitByNewLine[13].split(";"),
     time_stamp_fix: splitByNewLine[14].split(";"),
     time_stamp_post: splitByNewLine[15].split(";"),
-    dist_dest_prefix: splitByNewLine[16].split(";"),
-    dist_dest_fix: splitByNewLine[17].split(";"),
-    date: [splitByNewLine[18]],
-    name: [splitByNewLine[19]],
-    imo: [splitByNewLine[20]],
-    dwt: [splitByNewLine[21]],
-    loa: [splitByNewLine[22]],
-    beam: [splitByNewLine[23]],
-    draught_design: [splitByNewLine[24]],
-    built: [splitByNewLine[25]],
-    quantity: [splitByNewLine[26]],
-    type: [splitByNewLine[27]],
-    charterer: [splitByNewLine[28]],
-    load: [splitByNewLine[29]],
-    discharge: [splitByNewLine[30]],
-    laycan_from: [splitByNewLine[31]],
-    laycan_to: [splitByNewLine[32]],
-    route: [splitByNewLine[33]],
-    w_from: [splitByNewLine[34]],
-    w_to: [splitByNewLine[35]],
-    dist_to_dest_fix: [splitByNewLine[36]],
-    r_TA_fix: [splitByNewLine[37]],
-    r_FH_fix: [splitByNewLine[38]],
-    r_BH_fix: [splitByNewLine[39]],
-    r_TP_fix: [splitByNewLine[40]],
-    r_aver_fix: [splitByNewLine[41]],
-    error_occured: [splitByNewLine[42]]
+
+    ions_prefix: splitByNewLine[16].split(";"),
+    ions_fix: splitByNewLine[17].split(";"),
+    ions_post: splitByNewLine[18].split(";"),
+    lats_prefix: splitByNewLine[19].split(";"),
+    lats_fix: splitByNewLine[20].split(";"),
+    lats_post: splitByNewLine[21].split(";"),
+
+    dist_dest_prefix: splitByNewLine[22].split(";"),
+    dist_dest_fix: splitByNewLine[23].split(";"),
+    date: [splitByNewLine[24]],
+    name: [splitByNewLine[25]],
+    imo: [splitByNewLine[26]],
+    dwt: [splitByNewLine[27]],
+    loa: [splitByNewLine[28]],
+    beam: [splitByNewLine[29]],
+    draught_design: [splitByNewLine[30]],
+    built: [splitByNewLine[31]],
+    quantity: [splitByNewLine[32]],
+    type: [splitByNewLine[33]],
+    charterer: [splitByNewLine[34]],
+    load: [splitByNewLine[35]],
+    discharge: [splitByNewLine[36]],
+    laycan_from: [splitByNewLine[37]],
+    laycan_to: [splitByNewLine[38]],
+    route: [splitByNewLine[39]],
+    w_from: [splitByNewLine[40]],
+    w_to: [splitByNewLine[41]],
+    dist_to_dest_fix: [splitByNewLine[42]],
+    r_TA_fix: [splitByNewLine[43]],
+    r_FH_fix: [splitByNewLine[44]],
+    r_BH_fix: [splitByNewLine[45]],
+    r_TP_fix: [splitByNewLine[46]],
+    r_aver_fix: [splitByNewLine[47]],
+    error_occured: [splitByNewLine[48]],
+    rate: [splitByNewLine[49]],
+    unit: [splitByNewLine[50]],
+    time_to_dest: [splitByNewLine[51]]
   };
 
   // calculate hull slenderness
@@ -101,6 +112,17 @@ const createExcelDataStructure = (
       ...rawData.draught_post
     ],
 
+    ionsColumn: [
+      ...rawData.lats_prefix,
+      ...rawData.lats_fix,
+      ...rawData.lats_post
+    ],
+    latsColumn: [
+      ...rawData.lats_prefix,
+      ...rawData.lats_fix,
+      ...rawData.lats_post
+    ],
+
     timeStampColumn: [
       ...rawData.time_stamp_prefix,
       ...rawData.time_stamp_fix,
@@ -123,6 +145,8 @@ const createExcelDataStructure = (
     speed: [] as any,
     dist: [] as any,
     time: [] as any,
+    ions: [] as any,
+    lats: [] as any,
     draught: "" as string,
     remainingDistance: "",
     status: "",
@@ -142,6 +166,10 @@ const createExcelDataStructure = (
         let speed = temp.speed.reduce(reducer) / temp.speed.length;
         let dist = temp.dist.reduce(reducer) / temp.dist.length;
         let time = temp.time.reduce(reducer) / temp.time.length;
+
+        let ions = temp.ions.reduce(reducer) / temp.ions.length;
+        let lats = temp.lats.reduce(reducer) / temp.lats.length;
+
         let draught = temp.draught;
         let remainingDistance = temp.remainingDistance;
         let status = temp.status;
@@ -150,6 +178,8 @@ const createExcelDataStructure = (
           speed,
           dist,
           time,
+          ions,
+          lats,
           draught,
           temp.date,
           remainingDistance,
@@ -160,6 +190,8 @@ const createExcelDataStructure = (
       temp.speed = [];
       temp.dist = [];
       temp.time = [];
+      temp.ions = [];
+      temp.lats = [];
       temp.draught = "";
       temp.remainingDistance = "";
       temp.status = "";
@@ -170,6 +202,8 @@ const createExcelDataStructure = (
       temp.speed.push(Number(combined.speedColumn[i]));
       temp.dist.push(Number(combined.distColumn[i]));
       temp.time.push(Number(combined.timeColumn[i]));
+      temp.ions.push(Number(combined.ionsColumn[i]));
+      temp.lats.push(Number(combined.latsColumn[i]));
       temp.draught = combined.draughtColumn[i];
       temp.remainingDistance = combined.distanceColumn[i];
       temp.status = status[i];
@@ -181,10 +215,12 @@ const createExcelDataStructure = (
     speedColumn: averages.map(item => item[0]),
     distColumn: averages.map(item => item[1]),
     timeColumn: averages.map(item => item[2]),
-    draughtColumn: averages.map(item => item[3]),
-    timeStampColumn: averages.map(item => item[4]),
-    distanceColumn: averages.map(item => item[5]),
-    statusColumn: averages.map(item => item[6])
+    ionsColumn: averages.map(item => item[3]),
+    latsColumn: averages.map(item => item[4]),
+    draughtColumn: averages.map(item => item[5]),
+    timeStampColumn: averages.map(item => item[6]),
+    distanceColumn: averages.map(item => item[7]),
+    statusColumn: averages.map(item => item[8])
   };
 
   // list of column names to be added after data parsing
@@ -198,6 +234,8 @@ const createExcelDataStructure = (
     "speed",
     "dist",
     "time",
+    "ion",
+    "lats",
     "draught bound",
     "remaining distance",
     "status",
@@ -226,7 +264,10 @@ const createExcelDataStructure = (
     "r_BH_fix",
     "r_TP_fix",
     "r_aver_fix",
-    "error_occured"
+    "error_occured",
+    "rate",
+    "unit",
+    "time_to_dest"
   ];
 
   const calculatedData = calculcateAverages ? modifiedData : combined;
@@ -245,6 +286,8 @@ const createExcelDataStructure = (
     calculatedData.speedColumn,
     calculatedData.distColumn,
     calculatedData.timeColumn,
+    calculatedData.ionsColumn, // ions
+    calculatedData.latsColumn, // lats
     calculatedData.draughtColumn,
     calculatedData.distanceColumn,
     calculatedData.statusColumn,
@@ -273,7 +316,10 @@ const createExcelDataStructure = (
     rawData.r_BH_fix,
     rawData.r_TP_fix,
     rawData.r_aver_fix,
-    rawData.error_occured
+    rawData.error_occured,
+    rawData.rate,
+    rawData.unit,
+    rawData.time_to_dest
   ];
 
   // fill out rows on columns with less than matrix

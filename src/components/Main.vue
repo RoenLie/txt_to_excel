@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from "@vue/composition-api";
+import { defineComponent, ref, reactive, watch } from "@vue/composition-api";
 import { saveAs } from "file-saver";
 import Worker from "worker-loader!../workers/createExcelDocument.worker";
 import createExcelDataStructure from "./CreateExcelDataStructure";
@@ -71,8 +71,11 @@ export default defineComponent({
     let status = ref("");
     let loading = ref(false);
     let calculcateAverages = ref(true);
+    let localFiles = { target: { files: [] } };
 
     const openFile = (e: any) => {
+      localFiles.target.files = e.target.files;
+
       filesParsed.value = 0;
       status.value = "";
       parsedFileData = [];
@@ -84,6 +87,7 @@ export default defineComponent({
         m[0].map((x: any, i: any) => m.map((x: any) => x[i]));
 
       let files: any = e.target.files;
+
       if (files) {
         for (let i = 0, f; (f = files[i]); i++) {
           let reader = new FileReader();
@@ -156,6 +160,10 @@ export default defineComponent({
         loading.value = false;
       };
     };
+
+    watch(calculcateAverages, (value, prevValue) => {
+      if (localFiles.target.files.length > 0) openFile(localFiles);
+    });
 
     return {
       openFile,
