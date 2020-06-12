@@ -35,13 +35,13 @@ const createExcelDataStructure = (
     dist_dest_fix: splitByNewLine[23].split(";"),
     date: [splitByNewLine[24]],
     name: [splitByNewLine[25]],
-    imo: [splitByNewLine[26]],
-    dwt: [splitByNewLine[27]],
-    loa: [splitByNewLine[28]],
-    beam: [splitByNewLine[29]],
-    draught_design: [splitByNewLine[30]],
+    imo: [Number(splitByNewLine[26])],
+    dwt: [Number(splitByNewLine[27])],
+    loa: [Number(splitByNewLine[28])],
+    beam: [Number(splitByNewLine[29])],
+    draught_design: [Number(splitByNewLine[30])],
     built: [splitByNewLine[31]],
-    quantity: [splitByNewLine[32]],
+    quantity: [Number(splitByNewLine[32])],
     type: [splitByNewLine[33]],
     charterer: [splitByNewLine[34]],
     load: [splitByNewLine[35]],
@@ -49,18 +49,18 @@ const createExcelDataStructure = (
     laycan_from: [splitByNewLine[37]],
     laycan_to: [splitByNewLine[38]],
     route: [splitByNewLine[39]],
-    w_from: [splitByNewLine[40]],
-    w_to: [splitByNewLine[41]],
-    dist_to_dest_fix: [splitByNewLine[42]],
-    r_TA_fix: [splitByNewLine[43]],
-    r_FH_fix: [splitByNewLine[44]],
-    r_BH_fix: [splitByNewLine[45]],
-    r_TP_fix: [splitByNewLine[46]],
-    r_aver_fix: [splitByNewLine[47]],
+    w_from: [Number(splitByNewLine[40])],
+    w_to: [Number(splitByNewLine[41])],
+    dist_to_dest_fix: [Number(splitByNewLine[42])],
+    r_TA_fix: [Number(splitByNewLine[43])],
+    r_FH_fix: [Number(splitByNewLine[44])],
+    r_BH_fix: [Number(splitByNewLine[45])],
+    r_TP_fix: [Number(splitByNewLine[46])],
+    r_aver_fix: [Number(splitByNewLine[47])],
     error_occured: [splitByNewLine[48]],
-    rate: [splitByNewLine[49]],
+    rate: [Number(splitByNewLine[49])],
     unit: [splitByNewLine[50]],
-    time_to_dest: [splitByNewLine[51]]
+    time_to_dest: [Number(splitByNewLine[51])]
   };
 
   // calculate hull slenderness
@@ -76,6 +76,12 @@ const createExcelDataStructure = (
   rawData.draught_prefix.pop();
   rawData.draught_fix.pop();
   rawData.draught_post.pop();
+  rawData.ions_prefix.pop();
+  rawData.ions_fix.pop();
+  rawData.ions_post.pop();
+  rawData.lats_prefix.pop();
+  rawData.lats_fix.pop();
+  rawData.lats_post.pop();
 
   // create column with statuses matching the time stamps
   const status = [
@@ -111,9 +117,9 @@ const createExcelDataStructure = (
     ],
 
     ionsColumn: [
-      ...rawData.lats_prefix,
-      ...rawData.lats_fix,
-      ...rawData.lats_post
+      ...rawData.ions_prefix,
+      ...rawData.ions_fix,
+      ...rawData.ions_post
     ],
     latsColumn: [
       ...rawData.lats_prefix,
@@ -145,10 +151,10 @@ const createExcelDataStructure = (
     time: [] as any,
     ions: [] as any,
     lats: [] as any,
-    draught: "" as string,
-    remainingDistance: "",
-    status: "",
-    date: ""
+    draught: 0 as any,
+    remainingDistance: 0 as any,
+    status: "" as any,
+    date: "" as any
   };
 
   // calculate averages per day for speed, distance, time and draught
@@ -202,8 +208,8 @@ const createExcelDataStructure = (
       temp.time.push(Number(combined.timeColumn[i]));
       temp.ions = Number(combined.ionsColumn[i]);
       temp.lats = Number(combined.latsColumn[i]);
-      temp.draught = combined.draughtColumn[i];
-      temp.remainingDistance = combined.distanceColumn[i];
+      temp.draught = Number(combined.draughtColumn[i]);
+      temp.remainingDistance = Number(combined.distanceColumn[i]);
       temp.status = status[i];
     }
   }
@@ -232,7 +238,7 @@ const createExcelDataStructure = (
     "speed",
     "dist",
     "time",
-    "ion",
+    "ions",
     "lats",
     "draught bound",
     "remaining distance",
